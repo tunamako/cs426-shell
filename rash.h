@@ -16,8 +16,10 @@ public:
 	vector<string> history;
 	vector<string> queue;
 
-	string PATH;
 	string pwd;
+	string uname;
+	string prompt;
+	string PATH;
 
 };
 

@@ -2,22 +2,28 @@ CXX=g++
 
 CXXFLAGS = -std=c++17 -g -Wextra -lgtest -pthread
 
-OBJECTS = rash.o test_hw.o
+MAIN_OBJECTS = rash.o main.o
+TEST_OBJECTS = rash.o test_hw.o
+
+all: testRunner main
 
 
-all: testRunner
+main: $(MAIN_OBJECTS)
+	$(CXX) $(CXXFLAGS) -o main $(MAIN_OBJECTS)
 
-clean:
-	rm *.o testRunner
+testRunner: $(TEST_OBJECTS)
+	$(CXX) $(CXXFLAGS) -o testRunner $(TEST_OBJECTS)
 
-testRunner: $(OBJECTS)
-	$(CXX) $(CXXFLAGS) -o testRunner $(OBJECTS)
 
 test_hw.o: test_hw.cc
 	$(CXX) $(CXXFLAGS) -c test_hw.cc -o test_hw.o
 
-gtest_main.o: gtest_main.cc
-	$(CXX) $(CXXFLAGS) -c gtest_main.cc -o gtest_main.o
+main.o: main.cc
+	$(CXX) $(CXXFLAGS) -c main.cc -o main.o
 
 rash.o: rash.cc rash.h
 	$(CXX) $(CXXFLAGS) -c rash.cc -o rash.o
+
+
+clean:
+	rm *.o testRunner main

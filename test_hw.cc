@@ -8,7 +8,7 @@ TEST(ShellTest, testGetPath){
 	Rash *shell = new Rash();
 	EXPECT_EQ(shell->pwd, "/home/michael/Documents/cs426/shell");
 	EXPECT_EQ(shell->PATH, "/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl");
-
+	EXPECT_EQ(shell->uname, "michael");
 }
 
 
