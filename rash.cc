@@ -67,6 +67,7 @@ void Rash::execute(string cmd) {
 				//TODO: pipe output here to be controlled for more generality
 			}
 			wait(NULL);
+			
 			return;
 		}
 	}
