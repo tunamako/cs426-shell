@@ -1,7 +1,7 @@
 #include "rash.h"
-
+#include <unistd.h> 
 int main() {
 	Rash *shell = new Rash();
-	while(true)
-		shell->promptAndWait();
+	shell->run();
+	//execl("/usr/bin/ls", "/");
 }
