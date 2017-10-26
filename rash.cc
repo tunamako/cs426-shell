@@ -7,34 +7,32 @@
 #include <stdio.h>
 #include <string.h>
 
-void ErrorCheck(bool condition, string message) {
+void ErrorCheck(bool condition, char*message) {
 	if(condition)
-		perror(message.c_str());
+		perror(message);
 }
-void ErrorCheckExit(bool condition, string message) {
+void ErrorCheckExit(bool condition, char *message) {
 	if(condition) {
-		perror(message.c_str());
+		perror(message);
 		exit(1);
 	}
 }
+vector<string> splitStr(char *aString, char *delims) {
+	vector<string> ret;
+	char *temp = strtok(aString, delims);
 
+	while(temp != NULL) {
+		ret.push_back(string(temp));
+		temp = strtok(NULL, delims);
+	}
+	return ret;
+}
 string getPwd() {
 	char temp[4096];
-	ErrorCheckExit(getcwd(temp, 4096) == NULL, "Couldn't get current directory");
+	ErrorCheckExit(getcwd(temp, 4096) == NULL, strdup("Couldn't get current directory"));
 	return string(temp);
 }
-vector<string> getPATH() {
-	vector<string> pathdirs;
-	char *PATH = getenv("PATH");
-	char *temp = strtok(PATH, ":");
 
-	while(temp) {
-		pathdirs.push_back(string(temp));
-		temp = strtok(NULL, ":");
-	}
-	ErrorCheckExit(pathdirs.size() == 0, "Couldn't get PATH");
-	return pathdirs;
-}
 
 
 //Clearscreen codes from https://stackoverflow.com/questions/4062045/clearing-terminal-in-linux-with-c-code
@@ -42,19 +40,29 @@ Rash::Rash(){
 	pwd = getPwd();
 	uname = string(getenv("USER"));
 	prompt = "[" + uname + "@ " + pwd + "]$ ";
-	pathdirs = getPATH();
+	pathdirs = splitStr(getenv("PATH"), strdup(":"));
+	ErrorCheckExit(pathdirs.size() == 0, strdup("Couldn't get PATH"));
 	//cout << "\033[2J\033[1;1H";
 }
 Rash::~Rash(){}
 
 void Rash::run(){
-	string input;
+	vector<string> input;
+	string cmd;
 	while(true) {
-		execute(promptForInput());
+		input = splitStr(promptForInput(), strdup(" "));
+		char *args[input.size()];
+		cmd = input[0];
+
+		for(uint i = 1; i < input.size(); i++) {
+			args[i] = strdup(input[i].c_str());
+		}
+		args[input.size()] = NULL;
+		execute(cmd, args);
 	}
 }
 
-void Rash::execute(string cmd) {
+void Rash::execute(string cmd, char *args[]) {
 	struct stat buf;
 	string executable = "";
 
@@ -63,7 +71,7 @@ void Rash::execute(string cmd) {
 		if(stat(executable.c_str(), &buf) == 0) {
 			int pid = fork();
 			if(pid == 0) {
-				execl(executable.c_str(), cmd.c_str(), pwd.c_str());
+				execv(executable.c_str(), args);
 				//TODO: pipe output here to be controlled for more generality
 			}
 			wait(NULL);
@@ -71,14 +79,16 @@ void Rash::execute(string cmd) {
 			return;
 		}
 	}
-	ErrorCheckExit(true, cmd + ": Command not found");
+	cout << "rash: Command not found" << endl;
 }
 
-string Rash::promptForInput() {
-		string input;
-		cout << "\33[2K\r";
-		cout << prompt;
-		cin >> input;
+char *Rash::promptForInput() {
+		char *input = strdup("");
+		while(strlen(input) == 0) {
+			cout << "\33[2K\r";
+			cout << prompt;
+			cin.getline(input, 256);
+		}
 		return input;
 }
 

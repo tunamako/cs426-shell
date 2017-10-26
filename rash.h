@@ -10,8 +10,8 @@ public:
 	~Rash();
 	
 	void run();
-	void execute(string cmd);
-	string promptForInput();
+	void execute(string cmd, char *args[]);
+	char *promptForInput();
 
 	vector<string> commands;
 	vector<string> operators;
