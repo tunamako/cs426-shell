@@ -1,3 +1,5 @@
 *.o
+*.gch
 testRunner
 main
+requirements

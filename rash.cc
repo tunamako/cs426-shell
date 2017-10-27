@@ -20,7 +20,6 @@ void ErrorCheckExit(bool condition, char *message) {
 vector<string> splitStr(char *aString, char *delims) {
 	vector<string> ret;
 	char *temp = strtok(aString, delims);
-
 	while(temp != NULL) {
 		ret.push_back(string(temp));
 		temp = strtok(NULL, delims);
@@ -40,7 +39,7 @@ Rash::Rash(){
 	pwd = getPwd();
 	uname = string(getenv("USER"));
 	prompt = "[" + uname + "@ " + pwd + "]$ ";
-	pathdirs = splitStr(getenv("PATH"), strdup(":"));
+	pathdirs = splitStr(strdup(getenv("PATH")), strdup(":"));
 	ErrorCheckExit(pathdirs.size() == 0, strdup("Couldn't get PATH"));
 	//cout << "\033[2J\033[1;1H";
 }
@@ -58,28 +57,54 @@ void Rash::run(){
 			args[i] = strdup(input[i].c_str());
 		}
 		args[input.size()] = NULL;
-		execute(cmd, args);
+		cout << execute(cmd, args);
 	}
 }
 
-void Rash::execute(string cmd, char *args[]) {
+string Rash::execute(string cmd, char *args[]) {
+	string executable = findBin(cmd);
+	if(!executable.size()){
+		cout << "rash: Command not found: " + cmd << endl;
+		return "";
+	}
+
+	int pipefds[2];
+	char buffer[4096];
+
+	memset(buffer, 0, sizeof(buffer));
+	pipe(pipefds);
+	int pid = fork();	
+
+	if(pid == 0) {
+		dup2(pipefds[1], STDOUT_FILENO);
+		close(pipefds[0]);
+		close(pipefds[1]);
+		execv(executable.c_str(), args);
+	} else {
+		close(pipefds[1]);
+		read(pipefds[0], buffer, sizeof(buffer));
+		wait(NULL);
+		string temp = string(strdup(buffer));
+		memset(buffer, 0, sizeof(buffer));
+		return temp;
+	}
+}
+
+string Rash::findBin(string cmd) {
 	struct stat buf;
-	string executable = "";
+	string executable;
+
+	if(stat(cmd.c_str(), &buf) == 0){
+		return cmd;
+	}
 
 	for(auto dir : pathdirs) {
 		executable = dir + "/" + cmd;
-		if(stat(executable.c_str(), &buf) == 0) {
-			int pid = fork();
-			if(pid == 0) {
-				execv(executable.c_str(), args);
-				//TODO: pipe output here to be controlled for more generality
-			}
-			wait(NULL);
-			
-			return;
+		if(stat(executable.c_str(), &buf) == 0){
+			return executable;
 		}
 	}
-	cout << "rash: Command not found" << endl;
+	return "";
 }
 
 char *Rash::promptForInput() {
@@ -91,4 +116,3 @@ char *Rash::promptForInput() {
 		}
 		return input;
 }
-

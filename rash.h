@@ -10,11 +10,10 @@ public:
 	~Rash();
 	
 	void run();
-	void execute(string cmd, char *args[]);
+	string execute(string cmd, char *args[]);
+	string findBin(string cmd);
 	char *promptForInput();
-
-	vector<string> commands;
-	vector<string> operators;
+	
 	vector<string> history;
 	vector<string> queue;
 	vector<string> pathdirs;
