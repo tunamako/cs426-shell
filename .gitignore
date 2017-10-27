@@ -1,5 +1,3 @@
-*.o
-*.gch
-testRunner
-main
+src/*.o
+src/*.gch
 requirements

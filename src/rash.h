@@ -1,7 +1,16 @@
 #ifndef RASH_H
 #define RASH_H
+#include "rash.h"
+#include "parser.h"
+#include <iostream>
 #include <string>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
 #include <vector>
+
 
 using namespace std;
 class Rash{
@@ -10,14 +19,12 @@ public:
 	~Rash();
 	
 	void run();
-	string execute(string cmd, char *args[]);
-	string findBin(string cmd);
 	char *promptForInput();
 	
+	Parser *parser;
 	vector<string> history;
 	vector<string> queue;
 	vector<string> pathdirs;
-
 	string pwd;
 	string uname;
 	string prompt;
