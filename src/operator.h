@@ -18,29 +18,27 @@ class Op{
 public:
 	Op();
 	~Op();
-
-	virtual string execute() {return "";}
+	char **convertVector(vector<string> &aVector);
+	string findBin(string cmd, vector<string> &pathdirs);
+	virtual string execute();
 
 	Op *lhs;
 	Op *rhs;
-};
-
-class CommandOp: public Op{
-public:
-	CommandOp(vector<string> &input, vector<string> &pathdirs);
-	~CommandOp();
-
-	virtual string execute();
-
-	string executable;
-	vector<string> input;
 };
 
 class PipeOp: public Op{
 public:
 	PipeOp();
 	~PipeOp();
-
-	virtual string execute() {return "";}
 };
+
+class CommandOp: public Op{
+public:
+	CommandOp(vector<string> &input, vector<string> &pathdirs);
+	virtual string execute();
+
+	string executable;
+	vector<string> input;
+};
+
 #endif

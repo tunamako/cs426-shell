@@ -1,13 +1,4 @@
 #include "rash.h"
-#include "operator.h"
-#include <iostream>
-#include <string>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <string.h>
-#include <vector>
 
 void ErrorCheckExit(bool condition, char *message) {
 	if(condition) {
@@ -54,7 +45,9 @@ void Rash::run(){
 
 string Rash::interpret(vector<string> &input) {
 	Op *root = new CommandOp(input, pathdirs);
-	return root->execute();
+	string output = root->execute();
+	delete root;
+	return output;
 }
 
 char *Rash::promptForInput() {
@@ -66,4 +59,3 @@ char *Rash::promptForInput() {
 		}
 		return input;
 }
-

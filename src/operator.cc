@@ -1,15 +1,7 @@
-#include "rash.h"
 #include "operator.h"
-#include <iostream>
-#include <string>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <string.h>
-#include <vector>
 
-char **convertVector(vector<string> &aVector) {
+
+char **Op::convertVector(vector<string> &aVector) {
 	char **ret = new char*[aVector.size()];
 
 	for(uint i = 0; i < aVector.size(); i++) {
@@ -18,10 +10,10 @@ char **convertVector(vector<string> &aVector) {
 		strncpy(ret[i], temp, aVector[i].size());
 	}
 	ret[aVector.size()] = NULL;
-	
+
 	return ret;
 }
-string findBin(string cmd, vector<string> &pathdirs) {
+string Op::findBin(string cmd, vector<string> &pathdirs) {
 	struct stat buf;
 	string executable;
 
@@ -41,16 +33,17 @@ string findBin(string cmd, vector<string> &pathdirs) {
 
 Op::Op(){}
 Op::~Op(){}
+string Op::execute(){
+	return "";
+}
 
 PipeOp::PipeOp(){}
-PipeOp::~PipeOp(){}
 
 
 CommandOp::CommandOp(vector<string> &input, vector<string> &pathdirs){
 	this->executable = findBin(input[0], pathdirs);
 	this->input = input;
 }
-CommandOp::~CommandOp(){}
 
 string CommandOp::execute() {
 	if(!executable.size()){
@@ -58,6 +51,8 @@ string CommandOp::execute() {
 	}
 	int pipefds[2];
 	char buffer[4096];
+	char **args = convertVector(input);
+
 	pipe(pipefds);
 	memset(buffer, 0, 4096);
 
@@ -65,13 +60,16 @@ string CommandOp::execute() {
 	if(pid == 0) {
 		dup2(pipefds[1], STDOUT_FILENO);
 		close(pipefds[0]);
-
-		execv(executable.c_str(), convertVector(input));
-
+		execv(executable.c_str(), args);
 	} else {
 		close(pipefds[1]);
 		read(pipefds[0], (void *)buffer, 4096);
 		wait(NULL);
+
+		for(uint i = 0; i < input.size(); i++) {
+			delete[] args[i];
+		}
+		delete[] args;
 		return string(strdup(buffer));
 	}
 }

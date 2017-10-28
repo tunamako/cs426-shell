@@ -1,11 +1,7 @@
 #include "gtest/gtest.h"
 #include "rash.h"
 #include "operator.h"
-#include <string.h>
-#include <unistd.h> 
-#include <stdio.h>
-#include <string>
-#include <vector>
+
 
 TEST(ShellTest, testCreation){
 	Rash *shell = new Rash();
@@ -21,6 +17,31 @@ TEST(ShellTest, testCreation){
 	EXPECT_EQ(anothershell->pathdirs[0], "/usr/local/sbin");
 	EXPECT_EQ(anothershell->pathdirs[2], "/usr/bin");
 }
+TEST(ShellTest, testBinSearch) {
+	Rash *shell = new Rash();
+	Op *oper = new Op();
+
+	vector<string> pathdirs = shell->pathdirs;
+
+	EXPECT_EQ(oper->findBin("/bin/ls", pathdirs), "/bin/ls");
+	EXPECT_EQ(oper->findBin("ls", pathdirs), "/usr/bin/ls");
+	EXPECT_EQ(oper->findBin("/bin/cat", pathdirs), "/bin/cat");
+	EXPECT_EQ(oper->findBin("cat", pathdirs), "/usr/bin/cat");
+}
+
+TEST(ShellTest, testVecConversion) {
+	Op *oper = new Op();
+
+	vector<string> test = {"aaaa", "b", "c", "d"};
+	char **result = oper->convertVector(test);
+
+	EXPECT_EQ(string(result[0]), test[0]);
+	EXPECT_EQ(string(result[3]), test[3]);
+	EXPECT_EQ(strlen(result[0]), 4);
+}
+
+
+
 
 /*
 TEST(ShellTest, testSingleExecution) {
