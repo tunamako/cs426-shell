@@ -1,5 +1,5 @@
 #include "rash.h"
-#include "parser.h"
+#include "operator.h"
 #include <iostream>
 #include <string>
 #include <sys/stat.h>
@@ -40,7 +40,6 @@ Rash::Rash(){
 	prompt = "[" + uname + "@ " + pwd + "]$ ";
 	pathdirs = splitStr(strdup(getenv("PATH")), strdup(":"));
 	ErrorCheckExit(pathdirs.size() == 0, strdup("Couldn't get PATH"));
-	parser = new Parser(pathdirs);
 	//cout << "\033[2J\033[1;1H";
 }
 Rash::~Rash(){}
@@ -49,8 +48,13 @@ void Rash::run(){
 	vector<string> input;
 	while(true) {
 		input = splitStr(promptForInput(), strdup(" "));
-		cout << parser->interpret(input);
+		cout << interpret(input);
 	}
+}
+
+string Rash::interpret(vector<string> &input) {
+	Op *root = new CommandOp(input, pathdirs);
+	return root->execute();
 }
 
 char *Rash::promptForInput() {
@@ -62,3 +66,4 @@ char *Rash::promptForInput() {
 		}
 		return input;
 }
+

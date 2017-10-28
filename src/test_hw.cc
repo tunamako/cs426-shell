@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 #include "rash.h"
-#include "parser.h"
+#include "operator.h"
 #include <string.h>
 #include <unistd.h> 
 #include <stdio.h>
@@ -22,13 +22,6 @@ TEST(ShellTest, testCreation){
 	EXPECT_EQ(anothershell->pathdirs[2], "/usr/bin");
 }
 
-TEST(ShellTest, testBinSearch) {
-	Rash *shell = new Rash();
-	EXPECT_EQ(shell->parser->findBin("/bin/ls"), "/bin/ls");
-	EXPECT_EQ(shell->parser->findBin("ls"), "/usr/bin/ls");
-	EXPECT_EQ(shell->parser->findBin("/bin/cat"), "/bin/cat");
-	EXPECT_EQ(shell->parser->findBin("cat"), "/usr/bin/cat");
-}
 /*
 TEST(ShellTest, testSingleExecution) {
 	Rash *shell = new Rash();

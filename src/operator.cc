@@ -1,5 +1,5 @@
 #include "rash.h"
-#include "parser.h"
+#include "operator.h"
 #include <iostream>
 #include <string>
 #include <sys/stat.h>
@@ -9,7 +9,7 @@
 #include <string.h>
 #include <vector>
 
-char **convertVector(vector<string> aVector) {
+char **convertVector(vector<string> &aVector) {
 	char **ret = new char*[aVector.size()];
 
 	for(uint i = 0; i < aVector.size(); i++) {
@@ -18,21 +18,10 @@ char **convertVector(vector<string> aVector) {
 		strncpy(ret[i], temp, aVector[i].size());
 	}
 	ret[aVector.size()] = NULL;
-
+	
 	return ret;
 }
-
-Parser::Parser(vector<string> pathdirs){
-	this->pathdirs = pathdirs;
-}
-Parser::~Parser(){}
-
-string Parser::interpret(vector<string> input) {
-	Op *root = new CommandOp(input, findBin(input[0]));
-	return root->execute();
-}
-
-string Parser::findBin(string cmd) {
+string findBin(string cmd, vector<string> &pathdirs) {
 	struct stat buf;
 	string executable;
 
@@ -50,9 +39,6 @@ string Parser::findBin(string cmd) {
 	return "";
 }
 
-
-
-
 Op::Op(){}
 Op::~Op(){}
 
@@ -60,8 +46,8 @@ PipeOp::PipeOp(){}
 PipeOp::~PipeOp(){}
 
 
-CommandOp::CommandOp(vector<string> input, string executable){
-	this->executable = executable;
+CommandOp::CommandOp(vector<string> &input, vector<string> &pathdirs){
+	this->executable = findBin(input[0], pathdirs);
 	this->input = input;
 }
 CommandOp::~CommandOp(){}

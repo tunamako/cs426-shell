@@ -1,7 +1,7 @@
 #ifndef RASH_H
 #define RASH_H
 #include "rash.h"
-#include "parser.h"
+#include "operator.h"
 #include <iostream>
 #include <string>
 #include <sys/stat.h>
@@ -20,8 +20,8 @@ public:
 	
 	void run();
 	char *promptForInput();
+	string interpret(vector<string> &input);
 	
-	Parser *parser;
 	vector<string> history;
 	vector<string> queue;
 	vector<string> pathdirs;

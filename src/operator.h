@@ -1,7 +1,7 @@
-#ifndef PARSE_H
-#define PARSE_H
+#ifndef OP_H
+#define OP_H
 #include "rash.h"
-#include "parser.h"
+#include "operator.h"
 #include <iostream>
 #include <string>
 #include <sys/stat.h>
@@ -13,18 +13,6 @@
 
 
 using namespace std;
-class Parser{
-public:
-	Parser(vector<string> pathdirs);
-	~Parser();
-
-	string interpret(vector<string> input);
-	string findBin(string cmd);
-
-	vector<string> pathdirs;
-};
-
-
 
 class Op{
 public:
@@ -39,7 +27,7 @@ public:
 
 class CommandOp: public Op{
 public:
-	CommandOp(vector<string> input, string executable);
+	CommandOp(vector<string> &input, vector<string> &pathdirs);
 	~CommandOp();
 
 	virtual string execute();
