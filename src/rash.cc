@@ -3,17 +3,33 @@
 void ErrorCheckExit(bool condition, char *message) {
 	if(condition) {
 		perror(message);
+		delete message;
 		exit(1);
 	}
+	delete message;
 }
-vector<string> splitStr(char *aString, char *delims) {
+vector<string> splitStr(string aString, char *delims) {
 	vector<string> ret;
-	char *temp = strtok(aString, delims);
+	char *temp = strtok(strdup(aString.c_str()), delims);
 	while(temp != NULL) {
 		ret.push_back(string(temp));
 		temp = strtok(NULL, delims);
 	}
 	return ret;
+}
+vector<string> getPATH() {
+	extern char **environ;
+	int i = 0;
+	char *next = environ[i];
+
+	while(next){
+		if(string(next).substr(0,4) == "PATH") {
+			string pathcontent = string(next).substr(5, strlen(next));
+			return splitStr(pathcontent, strdup(":"));
+		}
+		next = environ[i++];
+	}
+	ErrorCheckExit(true, strdup("Couldnt find PATH variable"));
 }
 string getPwd() {
 	char temp[4096];
@@ -23,15 +39,13 @@ string getPwd() {
 
 
 
-//Clearscreen codes from 
-//https://stackoverflow.com/questions/4062045/clearing-terminal-in-linux-with-c-code
 Rash::Rash(){
-	pwd = getPwd();
-	uname = string(getenv("USER"));
-	prompt = "[" + uname + "@ " + pwd + "]$ ";
-	pathdirs = splitStr(strdup(getenv("PATH")), strdup(":"));
+	pathdirs = getPATH();
 	ErrorCheckExit(pathdirs.size() == 0, strdup("Couldn't get PATH"));
-	//cout << "\033[2J\033[1;1H";
+
+	uname = getpwuid(getuid())->pw_name;
+	pwd = "/home/" + uname;
+	chdir(pwd.c_str());
 }
 Rash::~Rash(){}
 
@@ -43,19 +57,44 @@ void Rash::run(){
 	}
 }
 
+string Rash::changedir(string dir) {
+	struct stat buf;
+
+	if(dir.size() == 0)
+		pwd = "/home/" + uname;
+	else if(stat(dir.c_str(), &buf) == 0)
+		pwd = dir;
+	else
+		return "cd: no such file or directory: " + dir + "\n";
+	
+	chdir(pwd.c_str());
+	return "";
+}
+
 string Rash::interpret(vector<string> &input) {
+	//Check for builtin functions
+	if(input[0] == "cd") 
+		return (input.size() == 1)
+			? changedir("")
+			: changedir(input[1]);
+
+	//Use exec
 	Op *root = new CommandOp(input, pathdirs);
-	string output = root->execute();
+	string output = "";
+	output = root->execute();
 	delete root;
 	return output;
 }
 
-char *Rash::promptForInput() {
-		char *input = strdup("");
-		while(strlen(input) == 0) {
-			cout << "\33[2K\r";
-			cout << prompt;
-			cin.getline(input, 256);
-		}
-		return input;
+string Rash::promptForInput() {
+	char *input = strdup("");
+	while(strlen(input) == 0) {
+		cout << "\33[2K\r";
+		if(pwd == "/home/" + uname) 
+			cout << "[" + uname + "@ ~]$ ";
+		else
+			cout << "[" + uname + "@ " + splitStr(pwd, strdup("/")).back() + "]$ ";
+		cin.getline(input, 256);
+	}
+	return string(input);
 }

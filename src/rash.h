@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <vector>
-
+#include <pwd.h>
 
 using namespace std;
 class Rash{
@@ -19,15 +19,15 @@ public:
 	~Rash();
 	
 	void run();
-	char *promptForInput();
+	string promptForInput();
 	string interpret(vector<string> &input);
+	string changedir(string dir);
 	
 	vector<string> history;
 	vector<string> queue;
 	vector<string> pathdirs;
 	string pwd;
 	string uname;
-	string prompt;
 
 };
 

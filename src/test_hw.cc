@@ -42,7 +42,6 @@ TEST(ShellTest, testVecConversion) {
 
 
 
-
 /*
 TEST(ShellTest, testSingleExecution) {
 	Rash *shell = new Rash();

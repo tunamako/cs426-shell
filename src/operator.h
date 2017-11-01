@@ -26,10 +26,21 @@ public:
 	Op *rhs;
 };
 
+class OutputRedirOp: public Op{
+public:
+	OutputRedirOp();
+	~OutputRedirOp();
+};
+class InputRedirOp: public Op{
+public:
+	InputRedirOp();
+	~InputRedirOp();
+};
+
 class PipeOp: public Op{
 public:
 	PipeOp();
-	~PipeOp();
+	virtual string execute();
 };
 
 class CommandOp: public Op{
@@ -37,8 +48,8 @@ public:
 	CommandOp(vector<string> &input, vector<string> &pathdirs);
 	virtual string execute();
 
-	string executable;
 	vector<string> input;
+	vector<string> pathdirs;
 };
 
 #endif

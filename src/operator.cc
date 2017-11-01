@@ -6,8 +6,8 @@ char **Op::convertVector(vector<string> &aVector) {
 
 	for(uint i = 0; i < aVector.size(); i++) {
 		char *temp = strdup(aVector[i].c_str());
-		ret[i] = new char[aVector[i].size()];
-		strncpy(ret[i], temp, aVector[i].size());
+		ret[i] = new char[strlen(temp)];
+		strncpy(ret[i], temp, strlen(temp));
 	}
 	ret[aVector.size()] = NULL;
 
@@ -31,24 +31,30 @@ string Op::findBin(string cmd, vector<string> &pathdirs) {
 	return "";
 }
 
+
 Op::Op(){}
 Op::~Op(){}
-string Op::execute(){
-	return "";
-}
+string Op::execute(){return "";}
 
-PipeOp::PipeOp(){}
+
+PipeOp::PipeOp() {}
+string PipeOp::execute() {
+	string leftout = lhs->execute();
+	return leftout;
+}
 
 
 CommandOp::CommandOp(vector<string> &input, vector<string> &pathdirs){
-	this->executable = findBin(input[0], pathdirs);
 	this->input = input;
+	this->pathdirs = pathdirs;
 }
 
 string CommandOp::execute() {
-	if(!executable.size()){
+	if(input[0].size() == 0){
 		return "";
 	}
+	string executable = findBin(input[0], pathdirs);
+
 	int pipefds[2];
 	char buffer[4096];
 	char **args = convertVector(input);
