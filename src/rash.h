@@ -22,6 +22,8 @@ public:
 	string promptForInput();
 	string interpret(vector<string> &input);
 	string changedir(string dir);
+	vector<string> expand(vector<string> &input);
+
 	
 	vector<string> history;
 	vector<string> queue;

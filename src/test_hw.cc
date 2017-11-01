@@ -6,13 +6,13 @@
 TEST(ShellTest, testCreation){
 	Rash *shell = new Rash();
 
-	EXPECT_EQ(shell->pwd, "/home/michael/Documents/cs426/shell");
+	EXPECT_EQ(shell->pwd, "/home/michael");
 	EXPECT_EQ(shell->uname, "michael");
 	EXPECT_EQ(shell->pathdirs[0], "/usr/local/sbin");
 	EXPECT_EQ(shell->pathdirs[2], "/usr/bin");
 
 	Rash *anothershell = new Rash();
-	EXPECT_EQ(anothershell->pwd, "/home/michael/Documents/cs426/shell");
+	EXPECT_EQ(anothershell->pwd, "/home/michael");
 	EXPECT_EQ(anothershell->uname, "michael");
 	EXPECT_EQ(anothershell->pathdirs[0], "/usr/local/sbin");
 	EXPECT_EQ(anothershell->pathdirs[2], "/usr/bin");
@@ -40,8 +40,17 @@ TEST(ShellTest, testVecConversion) {
 	EXPECT_EQ(strlen(result[0]), 4);
 }
 
+TEST(ShellTest, testExpansion) {
+	Rash *shell = new Rash();
+	vector<string> input = {"ls", "~"};
+	EXPECT_EQ(shell->expand(input)[0], "ls");
+	EXPECT_EQ(shell->expand(input)[1], "/home/michael");
+}
 
-
+TEST(ShellTest, testChdir) {
+	Rash *shell = new Rash();
+	shell->changedir("");
+}
 /*
 TEST(ShellTest, testSingleExecution) {
 	Rash *shell = new Rash();

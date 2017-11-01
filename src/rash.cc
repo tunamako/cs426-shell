@@ -53,17 +53,29 @@ void Rash::run(){
 	vector<string> input;
 	while(true) {
 		input = splitStr(promptForInput(), strdup(" "));
+		input = expand(input);
 		cout << interpret(input);
 	}
 }
 
+vector<string> Rash::expand(vector<string> &input) {
+	for(uint i = 0; i < input.size(); i++){
+		if (input[i][0] == '~')
+			input[i] = "/home/" + uname;
+		//$
+	}
+	return input;
+}
+
+
 string Rash::changedir(string dir) {
 	struct stat buf;
-
 	if(dir.size() == 0)
 		pwd = "/home/" + uname;
 	else if(stat(dir.c_str(), &buf) == 0)
-		pwd = dir;
+		pwd = (dir[0] == '/')
+			? dir
+			: pwd + "/" + dir;
 	else
 		return "cd: no such file or directory: " + dir + "\n";
 	
