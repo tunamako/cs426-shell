@@ -17,19 +17,17 @@ vector<string> splitStr(string aString, char *delims) {
 	}
 	return ret;
 }
-vector<string> getPATH() {
+string getEnv(string varname) {
 	extern char **environ;
 	int i = 0;
 	char *next = environ[i];
 
 	while(next){
-		if(string(next).substr(0,4) == "PATH") {
-			string pathcontent = string(next).substr(5, strlen(next));
-			return splitStr(pathcontent, strdup(":"));
-		}
+		if(string(next).substr(0,varname.size()) == varname) 
+			return string(next).substr(varname.size() + 1, strlen(next));
 		next = environ[i++];
 	}
-	ErrorCheckExit(true, strdup("Couldnt find PATH variable"));
+	ErrorCheckExit(true, strdup(("Couldnt find " + varname + " variable").c_str()));
 }
 string getPwd() {
 	char temp[4096];
@@ -40,7 +38,7 @@ string getPwd() {
 
 
 Rash::Rash(){
-	pathdirs = getPATH();
+	pathdirs = splitStr(getEnv("PATH"), strdup(":"));
 	ErrorCheckExit(pathdirs.size() == 0, strdup("Couldn't get PATH"));
 
 	uname = getpwuid(getuid())->pw_name;
@@ -61,8 +59,10 @@ void Rash::run(){
 vector<string> Rash::expand(vector<string> &input) {
 	for(uint i = 0; i < input.size(); i++){
 		if (input[i][0] == '~')
-			input[i] = "/home/" + uname;
-		//$
+			input[i].replace(0, 1, "/home/" + uname);
+		else if (input[i][0] == '$'){
+			input[i] = getEnv(input[i].substr(1, input[i].size() - 1));
+		}
 	}
 	return input;
 }
@@ -89,7 +89,8 @@ string Rash::interpret(vector<string> &input) {
 		return (input.size() == 1)
 			? changedir("")
 			: changedir(input[1]);
-
+	if(input[0] == "exit")
+		exit(1);
 	//Use exec
 	Op *root = new CommandOp(input, pathdirs);
 	string output = "";
