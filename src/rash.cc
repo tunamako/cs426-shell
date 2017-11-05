@@ -20,9 +20,12 @@ void Rash::run(){
 		cout << interpret(input);
 	}
 }
+
 //This should be recursive
 string Rash::interpret(vector<string> &input) {
 	input = expand(input);
+	if(input.size() == 0)
+		return "";
 	if(input[0] == "")
 		perror("glob");
 
@@ -40,10 +43,12 @@ Op *Rash::parse(vector<string> &input) {
 string Rash::promptForInput() {
 	char *input = strdup("");
 	string pwd = getPwd();
-	pwd = (pwd == "/home/" + uname)? "~" : pwd;
+	if (pwd.substr(0, 6 + uname.size()) == "/home/" + uname)
+		pwd.replace(0, 6 + uname.size(), "~");
+	
 	string prompt = "[" + uname + "@ " + pwd + "]$ ";
-
 	cout << "\33[2K\r" + prompt;
+
 	cin.getline(input, 256);
 	return string(input);
 }

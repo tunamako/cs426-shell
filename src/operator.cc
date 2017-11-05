@@ -19,21 +19,12 @@ CommandOp::CommandOp(vector<string> &input){
 }
 
 string CommandOp::execute() {
-	if(input[0].size() == 0)
+	if(input[0].size() == 0 || checkBuiltins())
 		return "";
-
-	if(input[0] == "cd"){
-		if(input.size() == 1)
-			input.push_back("/home/" + string(getpwuid(getuid())->pw_name));
-		if(chdir(input[1].c_str()) == -1)
-			return "rash: No such file or directory: " + input[1] + "\n";
-		setenv(strdup("PWD"), input[1].c_str(), 1);
-		return "";
-	}
-	if(input[0] == "exit")
-		exit(1);
-
+	
 	string executable = findBin(input[0]);
+	if(executable == "")
+		return "rash: Command not found: " + input[0] + "\n";
 
 	int pipefds[2];
 	char buffer[4096];
@@ -58,4 +49,20 @@ string CommandOp::execute() {
 		delete[] args;
 		return string(strdup(buffer));
 	}
+}
+
+bool CommandOp::checkBuiltins() {
+	if(input[0] == "cd"){
+		if(input.size() == 1)
+			input.push_back("/home/" + string(getpwuid(getuid())->pw_name));
+		if(chdir(input[1].c_str()) != -1)
+			setenv(strdup("PWD"), input[1].c_str(), 1);
+		else
+			cout << "rash: No such file or directory: " + input[1] + "\n";
+		return true;
+	}
+	if(input[0] == "exit")
+		exit(1);
+
+	return false;
 }

@@ -9,6 +9,7 @@
 #include <iostream>
 
 void ErrorCheckExit(bool condition, std::string message);
+void ErrorCheck(bool condition, std::string message);
 std::vector<std::string> splitStr(std::string aString, char *delims);
 std::string getEnv(std::string varname);
 std::string getPwd();

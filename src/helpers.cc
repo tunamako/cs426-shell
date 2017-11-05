@@ -7,6 +7,10 @@ void ErrorCheckExit(bool condition, string message) {
 		exit(1);
 	}
 }
+void ErrorCheck(bool condition, string message) {
+	if(condition)
+		perror(message.c_str());
+}
 
 vector<string> splitStr(string aString, char *delims) {
 	vector<string> ret;
@@ -28,7 +32,7 @@ string getEnv(string varname) {
 			return string(next).substr(varname.size() + 1, strlen(next));
 		next = environ[i++];
 	}
-	ErrorCheckExit(true, "Couldnt find " + varname + " variable");
+	return "";
 }
 
 string getPwd() {
@@ -41,9 +45,11 @@ char **convertVector(vector<string> &aVector) {
 	char **ret = new char*[aVector.size()];
 
 	for(uint i = 0; i < aVector.size(); i++) {
+		int strsize = aVector[i].size();
 		char *temp = strdup(aVector[i].c_str());
-		ret[i] = new char[strlen(temp)];
-		strncpy(ret[i], temp, strlen(temp));
+		ret[i] = new char[strsize];
+		strncpy(ret[i], temp, strsize);
+		ret[i][strsize] = 0;
 	}
 	ret[aVector.size()] = NULL;
 
@@ -52,17 +58,14 @@ char **convertVector(vector<string> &aVector) {
 
 string findBin(string cmd) {
 	struct stat buf;
-	string executable;
 	if(stat(cmd.c_str(), &buf) == 0)
 		return cmd;
 
-	vector<string> pathdirs = splitStr(getEnv("PATH"),":");
-
-	for(auto dir : pathdirs) {
+	string executable;
+	for(auto dir : splitStr(getEnv("PATH"),":")) {
 		executable = dir + "/" + cmd;
 		if(stat(executable.c_str(), &buf) == 0)
 			return executable;
 	}
-	cout << "rash: Command not found: " + cmd << endl;
 	return "";
 }

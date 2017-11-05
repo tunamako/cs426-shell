@@ -1,6 +1,6 @@
 CXX=g++
 
-CXXFLAGS = -std=c++17 -g -Wextra -lgtest -pthread
+CXXFLAGS = -std=c++17 -g -Wextra -lgtest
 
 MAIN_OBJECTS = src/helpers.o src/rash.o src/main.o src/operator.o 
 TEST_OBJECTS = src/helpers.o src/rash.o src/test_hw.o src/operator.o

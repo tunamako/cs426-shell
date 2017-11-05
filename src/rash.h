@@ -4,17 +4,7 @@
 #include "operator.h"
 #include "helpers.h"
 
-#include <iostream>
-#include <string>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <string.h>
-#include <vector>
-#include <pwd.h>
 #include <glob.h>
-#include <stdlib.h>
 
 class Rash{
 public:
