@@ -1,7 +1,7 @@
 #ifndef OP_H
 #define OP_H
-#include "rash.h"
-#include "operator.h"
+#include "helpers.h"
+
 #include <iostream>
 #include <string>
 #include <sys/stat.h>
@@ -10,17 +10,15 @@
 #include <stdio.h>
 #include <string.h>
 #include <vector>
+#include <pwd.h>
+#include <stdlib.h>
 
-
-using namespace std;
 
 class Op{
 public:
 	Op();
 	~Op();
-	char **convertVector(vector<string> &aVector);
-	string findBin(string cmd, vector<string> &pathdirs);
-	virtual string execute();
+	virtual std::string execute();
 
 	Op *lhs;
 	Op *rhs;
@@ -40,16 +38,15 @@ public:
 class PipeOp: public Op{
 public:
 	PipeOp();
-	virtual string execute();
+	virtual std::string execute();
 };
 
 class CommandOp: public Op{
 public:
-	CommandOp(vector<string> &input, vector<string> &pathdirs);
-	virtual string execute();
+	CommandOp(std::vector<std::string> &input);
+	virtual std::string execute();
 
-	vector<string> input;
-	vector<string> pathdirs;
+	std::vector<std::string> input;
 };
 
 #endif

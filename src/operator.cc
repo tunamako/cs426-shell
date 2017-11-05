@@ -1,36 +1,6 @@
 #include "operator.h"
 
-
-char **Op::convertVector(vector<string> &aVector) {
-	char **ret = new char*[aVector.size()];
-
-	for(uint i = 0; i < aVector.size(); i++) {
-		char *temp = strdup(aVector[i].c_str());
-		ret[i] = new char[strlen(temp)];
-		strncpy(ret[i], temp, strlen(temp));
-	}
-	ret[aVector.size()] = NULL;
-
-	return ret;
-}
-string Op::findBin(string cmd, vector<string> &pathdirs) {
-	struct stat buf;
-	string executable;
-
-	if(stat(cmd.c_str(), &buf) == 0){
-		return cmd;
-	}
-
-	for(auto dir : pathdirs) {
-		executable = dir + "/" + cmd;
-		if(stat(executable.c_str(), &buf) == 0){
-			return executable;
-		}
-	}
-	cout << "rash: Command not found: " + cmd << endl;
-	return "";
-}
-
+using namespace std;
 
 Op::Op(){}
 Op::~Op(){}
@@ -44,16 +14,26 @@ string PipeOp::execute() {
 }
 
 
-CommandOp::CommandOp(vector<string> &input, vector<string> &pathdirs){
+CommandOp::CommandOp(vector<string> &input){
 	this->input = input;
-	this->pathdirs = pathdirs;
 }
 
 string CommandOp::execute() {
-	if(input[0].size() == 0){
+	if(input[0].size() == 0)
+		return "";
+
+	if(input[0] == "cd"){
+		if(input.size() == 1)
+			input.push_back("/home/" + string(getpwuid(getuid())->pw_name));
+		if(chdir(input[1].c_str()) == -1)
+			return "rash: No such file or directory: " + input[1] + "\n";
+		setenv(strdup("PWD"), input[1].c_str(), 1);
 		return "";
 	}
-	string executable = findBin(input[0], pathdirs);
+	if(input[0] == "exit")
+		exit(1);
+
+	string executable = findBin(input[0]);
 
 	int pipefds[2];
 	char buffer[4096];

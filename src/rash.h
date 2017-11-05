@@ -2,6 +2,8 @@
 #define RASH_H
 #include "rash.h"
 #include "operator.h"
+#include "helpers.h"
+
 #include <iostream>
 #include <string>
 #include <sys/stat.h>
@@ -11,25 +13,24 @@
 #include <string.h>
 #include <vector>
 #include <pwd.h>
+#include <glob.h>
+#include <stdlib.h>
 
-using namespace std;
 class Rash{
 public:
 	Rash();
 	~Rash();
 	
 	void run();
-	string promptForInput();
-	string interpret(vector<string> &input);
-	string changedir(string dir);
-	vector<string> expand(vector<string> &input);
-
+	std::string promptForInput();
+	std::string interpret(std::vector<std::string> &input);
+	std::vector<std::string> expand(std::vector<std::string> &input);
+	Op *parse(std::vector<std::string> &input);
 	
-	vector<string> history;
-	vector<string> queue;
-	vector<string> pathdirs;
-	string pwd;
-	string uname;
+	std::vector<std::string> history;
+	std::vector<std::string> queue;
+	std::vector<std::string> pathdirs;
+	std::string uname;
 
 };
 
