@@ -42,7 +42,7 @@ TEST(ShellTest, testExpansion) {
 	input = {"ls", "D*"};
 	EXPECT_EQ(shell->expand(input)[2], "Documents");
 	input = {"ls", "/*"};
-	EXPECT_EQ(shell->expand(input)[4], "/sys");
+	EXPECT_EQ(shell->globString(input[1]), "/backup /bin /boot /dev /etc /home /lib /lib64 /lost+found /mnt /opt /proc /root /run /sbin /srv /sys /tmp /usr /var");
 }
 
 

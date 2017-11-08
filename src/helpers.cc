@@ -16,7 +16,7 @@ vector<string> splitStr(string aString, char *delims) {
 	vector<string> ret;
 	char *temp = strtok(strdup(aString.c_str()), delims);
 	while(temp != NULL) {
-		ret.push_back(string(temp));
+		ret.push_back(string(strdup(temp)));
 		temp = strtok(NULL, delims);
 	}
 	return ret;
@@ -62,7 +62,8 @@ string findBin(string cmd) {
 		return cmd;
 
 	string executable;
-	for(auto dir : splitStr(getEnv("PATH"),":")) {
+	vector<string> pathdirs = splitStr(getEnv("PATH"),":");
+	for(auto dir : pathdirs) {
 		executable = dir + "/" + cmd;
 		if(stat(executable.c_str(), &buf) == 0)
 			return executable;

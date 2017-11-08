@@ -41,9 +41,9 @@ string CommandOp::execute() {
 	} else {
 		close(pipefds[1]);
 		read(pipefds[0], (void *)buffer, 4096);
-		wait(NULL);
+		waitpid(pid, NULL, WNOHANG);
 
-		for(uint i = 0; i < input.size(); i++) {
+		for(uint i = 0; i < sizeof(args)/sizeof(args[0]); i++) {
 			delete[] args[i];
 		}
 		delete[] args;
