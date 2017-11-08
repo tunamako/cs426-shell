@@ -34,8 +34,15 @@ TEST(ShellTest, testExpansion) {
 	vector<string> input = {"ls", "~"};
 	EXPECT_EQ(shell->expand(input)[0], "ls");
 	EXPECT_EQ(shell->expand(input)[1], "/home/michael");
+
 	input = {"ls", "~/*ub"};
 	EXPECT_EQ(shell->expand(input)[1], "/home/michael/pub");
+	input = {"ls", "*ub"};
+	EXPECT_EQ(shell->expand(input)[1], "pub");
+	input = {"ls", "D*"};
+	EXPECT_EQ(shell->expand(input)[2], "Documents");
+	input = {"ls", "/*"};
+	EXPECT_EQ(shell->expand(input)[4], "/sys");
 }
 
 

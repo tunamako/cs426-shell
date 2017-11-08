@@ -1,3 +1,5 @@
 src/*.o
 src/*.gch
+bin/main
+bin/testRunner
 requirements

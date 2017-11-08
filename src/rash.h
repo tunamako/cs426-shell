@@ -14,6 +14,7 @@ public:
 	void run();
 	std::string promptForInput();
 	std::string interpret(std::vector<std::string> &input);
+	std::string globString(std::string input);
 	std::vector<std::string> expand(std::vector<std::string> &input);
 	Op *parse(std::vector<std::string> &input);
 	
