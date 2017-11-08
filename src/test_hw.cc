@@ -4,6 +4,25 @@
 #include "helpers.h"
 
 using namespace std;
+TEST(HelpersTest, testBinSearch) {
+	EXPECT_EQ(findBin("/bin/ls"), "/bin/ls");
+	EXPECT_EQ(findBin("ls"), "/usr/bin/ls");
+	EXPECT_EQ(findBin("/bin/cat"), "/bin/cat");
+	EXPECT_EQ(findBin("cat"), "/usr/bin/cat");
+}
+
+TEST(HelpersTest, testGetOperatorPos) {
+
+}
+
+TEST(HelpersTest, testVecConversion) {
+	vector<string> test = {"aaaa", "b", "c", "d"};
+	char **result = convertVector(test);
+
+	EXPECT_EQ(string(result[0]), test[0]);
+	EXPECT_EQ(string(result[3]), test[3]);
+}
+
 TEST(ShellTest, testCreation){
 	Rash *shell = new Rash();
 
@@ -13,20 +32,6 @@ TEST(ShellTest, testCreation){
 
 	Rash *anothershell = new Rash();
 	EXPECT_EQ(anothershell->uname, "michael");
-}
-TEST(ShellTest, testBinSearch) {
-	EXPECT_EQ(findBin("/bin/ls"), "/bin/ls");
-	EXPECT_EQ(findBin("ls"), "/usr/bin/ls");
-	EXPECT_EQ(findBin("/bin/cat"), "/bin/cat");
-	EXPECT_EQ(findBin("cat"), "/usr/bin/cat");
-}
-
-TEST(ShellTest, testVecConversion) {
-	vector<string> test = {"aaaa", "b", "c", "d"};
-	char **result = convertVector(test);
-
-	EXPECT_EQ(string(result[0]), test[0]);
-	EXPECT_EQ(string(result[3]), test[3]);
 }
 
 TEST(ShellTest, testExpansion) {
@@ -45,6 +50,13 @@ TEST(ShellTest, testExpansion) {
 	EXPECT_EQ(shell->globString(input[1]), "/backup /bin /boot /dev /etc /home /lib /lib64 /lost+found /mnt /opt /proc /root /run /sbin /srv /sys /tmp /usr /var");
 }
 
+TEST(ShellTest, testInputParsing) {
+	Rash *shell = new Rash();
+	vector<string> input = {"ls", "~/pub", "|", "grep", "wah"};
+
+	Op *root = shell->parse(input);
+	EXPECT_EQ(root->lhs->execute(), "test\nwah.txt");
+}
 
 GTEST_API_ int main(int argc, char *argv[]){
 	printf("Running tests...\n\r");

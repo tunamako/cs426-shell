@@ -1,6 +1,8 @@
 #include "helpers.h"
+#include <sstream>
 
 using namespace std;
+
 void ErrorCheckExit(bool condition, string message) {
 	if(condition) {
 		perror(message.c_str());
@@ -12,14 +14,14 @@ void ErrorCheck(bool condition, string message) {
 		perror(message.c_str());
 }
 
-vector<string> splitStr(string aString, char *delims) {
+vector<string> splitStr(string aString, char delimiter) {
 	vector<string> ret;
-	char *temp = strtok(strdup(aString.c_str()), delims);
-	while(temp != NULL) {
-		ret.push_back(string(strdup(temp)));
-		temp = strtok(NULL, delims);
-	}
-	return ret;
+    stringstream ss(aString);
+    string temp;
+    while (getline(ss, temp, delimiter)) {
+        ret.push_back(temp);
+    }
+    return ret;
 }
 
 string getEnv(string varname) {
@@ -62,11 +64,15 @@ string findBin(string cmd) {
 		return cmd;
 
 	string executable;
-	vector<string> pathdirs = splitStr(getEnv("PATH"),":");
+	vector<string> pathdirs = splitStr(getEnv("PATH"),':');
 	for(auto dir : pathdirs) {
 		executable = dir + "/" + cmd;
 		if(stat(executable.c_str(), &buf) == 0)
 			return executable;
 	}
 	return "";
+}
+
+int getLastPositionOf(vector<string> &input, string delims) {
+
 }

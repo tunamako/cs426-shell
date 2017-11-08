@@ -3,7 +3,7 @@
 using namespace std;
 
 Rash::Rash(){
-	pathdirs = splitStr(getEnv("PATH"), strdup(":"));
+	pathdirs = splitStr(getEnv("PATH"), ':');
 	ErrorCheckExit(pathdirs.size() == 0, "Couldn't get PATH");
 
 	uname = getpwuid(getuid())->pw_name;
@@ -16,28 +16,33 @@ Rash::~Rash(){}
 void Rash::run(){
 	vector<string> input;
 	while(true) {
-		input = splitStr(promptForInput(), strdup(" "));
+		input = splitStr(promptForInput(), ' ');
 		cout << interpret(input);
 	}
 }
 
-//This should be recursive
 string Rash::interpret(vector<string> &input) {
 	input = expand(input);
-	if(input.size() == 0)
+	if(input.size() == 0){
 		return "";
-	if(input[0] == "")
+	}
+	if(input[0] == ""){
 		perror("glob");
-
-	//Use exec
+		return "";
+	}
 	Op *root = parse(input);
 	string output = root->execute();
 	delete root;
 	return output;
 }
 
+//This should be recursive
 Op *Rash::parse(vector<string> &input) {
 	return new CommandOp(input);
+	//get last postition of an operator
+	//set that operator as root
+	//set everything to the right of the operator as its rhs
+	//set the lhs as a recursive call on the vector to the left of the operator
 }
 
 string Rash::promptForInput() {
@@ -57,13 +62,8 @@ string Rash::globString(string input){
 	glob_t result;
 	if(glob(input.c_str(), GLOB_NOCHECK, NULL, &result) == 0){
 		input = "";
-
-		for(uint j = 0; j < result.gl_pathc; j++) {
-			if (j == result.gl_pathc - 1)
-				input += string(result.gl_pathv[j]);
-			else
-				input += string(result.gl_pathv[j]) + " ";
-		}
+		for(uint j = 0; j < result.gl_pathc; j++)
+			input += string(result.gl_pathv[j]) + " ";
 	} else {
 		return "";
 	}
@@ -83,7 +83,7 @@ vector<string> Rash::expand(vector<string> &input) {
 		input[i] = globString(input[i]);
 
 		if(input[i] != ""){
-			for(auto v : splitStr(input[i], " ")) 
+			for(auto v : splitStr(input[i], strdup(" ")[0])) 
 				input.insert(input.begin() + i + 1, v);
 			input.erase(input.begin() + i);
 		} else {

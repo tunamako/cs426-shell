@@ -10,7 +10,7 @@
 
 void ErrorCheckExit(bool condition, std::string message);
 void ErrorCheck(bool condition, std::string message);
-std::vector<std::string> splitStr(std::string aString, char *delims);
+std::vector<std::string> splitStr(std::string aString, char delims);
 std::string getEnv(std::string varname);
 std::string getPwd();
 char **convertVector(std::vector<std::string> &aVector);
