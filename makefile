@@ -9,9 +9,11 @@ all: bin/testRunner bin/main
 
 
 bin/main: $(MAIN_OBJECTS)
+	@mkdir -p bin
 	$(CXX) $(CXXFLAGS) -o bin/main $(MAIN_OBJECTS)
 
 bin/testRunner: $(TEST_OBJECTS)
+	@mkdir -p bin
 	$(CXX) $(CXXFLAGS) -o bin/testRunner $(TEST_OBJECTS)
 
 

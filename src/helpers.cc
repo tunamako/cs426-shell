@@ -72,6 +72,19 @@ string findBin(string cmd) {
 	return "";
 }
 
-int getLastPositionOf(vector<string> &input, string delims) {
 
+//Getting the index of the iterator on return is from:
+//https://stackoverflow.com/questions/24997910/get-index-in-vector-from-reverse-iterator
+int getLastPositionOf(vector<string> &input, string delims) {
+	vector<string>::reverse_iterator iter = input.rbegin();
+
+	while(iter != input.rend()) {
+		for(auto op : delims) {
+			string temp(1, op);
+			if(*iter == temp)
+				return distance(input.begin(), iter.base()) - 1;
+		}
+		*iter++;
+	}
+	return -1;
 }

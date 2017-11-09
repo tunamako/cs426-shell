@@ -12,6 +12,13 @@ TEST(HelpersTest, testBinSearch) {
 }
 
 TEST(HelpersTest, testGetOperatorPos) {
+	string operators = "|<>";
+	vector<string> input = {"ls", "~/pub", "|", "grep", "wah"};
+	EXPECT_EQ(getLastPositionOf(input, operators), 2);
+	input = {"ls","<","test"};
+	EXPECT_EQ(getLastPositionOf(input, operators), 1);
+	input = {"ls", ">", "test"};
+	EXPECT_EQ(getLastPositionOf(input, operators), 1);
 
 }
 
@@ -22,6 +29,8 @@ TEST(HelpersTest, testVecConversion) {
 	EXPECT_EQ(string(result[0]), test[0]);
 	EXPECT_EQ(string(result[3]), test[3]);
 }
+
+
 
 TEST(ShellTest, testCreation){
 	Rash *shell = new Rash();
@@ -49,7 +58,7 @@ TEST(ShellTest, testExpansion) {
 	input = {"ls", "/*"};
 	EXPECT_EQ(shell->globString(input[1]), "/backup /bin /boot /dev /etc /home /lib /lib64 /lost+found /mnt /opt /proc /root /run /sbin /srv /sys /tmp /usr /var ");
 }
-
+/*
 TEST(ShellTest, testInputParsing) {
 	Rash *shell = new Rash();
 	vector<string> input = {"ls", "~/pub", "|", "grep", "wah"};
@@ -57,7 +66,7 @@ TEST(ShellTest, testInputParsing) {
 	Op *root = shell->parse(input);
 	EXPECT_EQ(root->lhs->execute(), "test\nwah.txt");
 }
-
+*/
 GTEST_API_ int main(int argc, char *argv[]){
 	printf("Running tests...\n\r");
 	testing::InitGoogleTest(&argc, argv);
