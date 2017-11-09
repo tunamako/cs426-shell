@@ -38,11 +38,34 @@ string Rash::interpret(vector<string> &input) {
 
 //This should be recursive
 Op *Rash::parse(vector<string> &input) {
-	return new CommandOp(input);
 	//get last postition of an operator
+	int nextOpPos = getLastPositionOf(input, "|><");
+
 	//set that operator as root
+	Op *nextOp;
+	if (nextOpPos == -1) {
+		return new CommandOp(input);
+	} else if (input[nextOpPos] == "|") {
+		nextOp = new PipeOp();
+	} else if (input[nextOpPos] == ">") {
+		nextOp = new OutputRedirOp();
+	} else if (input[nextOpPos] == "<") {
+		nextOp = new InputRedirOp();
+	}
+
 	//set everything to the right of the operator as its rhs
+	vector<string>::iterator start = input.begin() + nextOpPos + 1;
+	vector<string>::iterator end = input.begin() + input.size() - 1;
+	vector<string> newrhs(start, end);
+	nextOp->rhs = parse(newrhs);
+
 	//set the lhs as a recursive call on the vector to the left of the operator
+	start = input.begin();
+	end = input.begin() + nextOpPos - 1;
+	vector<string> newlhs(start, end);
+	nextOp->lhs = parse(newlhs);
+
+	return nextOp;
 }
 
 string Rash::promptForInput() {

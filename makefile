@@ -34,3 +34,4 @@ src/helpers.o: src/helpers.cc src/helpers.h
 
 clean:
 	rm src/*.o bin/testRunner bin/main 
+	rm -r bin

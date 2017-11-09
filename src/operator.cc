@@ -4,17 +4,39 @@ using namespace std;
 
 Op::Op(){}
 Op::~Op(){}
-string Op::execute(){return "";}
+string Op::execute() {
+	return "";
+}
 
+NullOp::NullOp(){
+	rhs = NULL;
+	lhs = NULL;
+}
+NullOp::~NullOp(){}
+string NullOp::execute() {
+	return "";
+}
+
+OutputRedirOp::OutputRedirOp() {}
+OutputRedirOp::~OutputRedirOp() {}
+string OutputRedirOp::execute() {
+	return "";
+}
+
+InputRedirOp::InputRedirOp() {}
+InputRedirOp::~InputRedirOp() {}
+string InputRedirOp::execute() {
+	return "";
+}
 
 PipeOp::PipeOp() {}
 string PipeOp::execute() {
-	string leftout = lhs->execute();
-	return leftout;
 }
 
 
 CommandOp::CommandOp(vector<string> &input){
+	rhs = new NullOp();
+	lhs = new NullOp();
 	this->input = input;
 }
 

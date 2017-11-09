@@ -58,7 +58,7 @@ TEST(ShellTest, testExpansion) {
 	input = {"ls", "/*"};
 	EXPECT_EQ(shell->globString(input[1]), "/backup /bin /boot /dev /etc /home /lib /lib64 /lost+found /mnt /opt /proc /root /run /sbin /srv /sys /tmp /usr /var ");
 }
-/*
+
 TEST(ShellTest, testInputParsing) {
 	Rash *shell = new Rash();
 	vector<string> input = {"ls", "~/pub", "|", "grep", "wah"};
@@ -66,7 +66,7 @@ TEST(ShellTest, testInputParsing) {
 	Op *root = shell->parse(input);
 	EXPECT_EQ(root->lhs->execute(), "test\nwah.txt");
 }
-*/
+
 GTEST_API_ int main(int argc, char *argv[]){
 	printf("Running tests...\n\r");
 	testing::InitGoogleTest(&argc, argv);
