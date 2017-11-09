@@ -52,10 +52,9 @@ string Rash::promptForInput() {
 		pwd.replace(0, 6 + uname.size(), "~");
 	
 	string prompt = "[" + uname + "@ " + pwd + "]$ ";
-	cout << "\33[2K\r" + prompt;
-
-	cin.getline(input, 256);
-	return string(input);
+	char *output = readline(("\33[2K\r" + prompt).c_str());
+	add_history(output);
+	return string(output);
 }
 
 string Rash::globString(string input){

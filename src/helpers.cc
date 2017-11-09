@@ -16,12 +16,11 @@ void ErrorCheck(bool condition, string message) {
 
 vector<string> splitStr(string aString, char delimiter) {
 	vector<string> ret;
-    stringstream ss(aString);
-    string temp;
-    while (getline(ss, temp, delimiter)) {
-        ret.push_back(temp);
-    }
-    return ret;
+	stringstream ss(aString);
+	string temp;
+	while (getline(ss, temp, delimiter))
+		ret.push_back(temp);
+	return ret;
 }
 
 string getEnv(string varname) {

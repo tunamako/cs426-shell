@@ -5,7 +5,8 @@
 #include "helpers.h"
 
 #include <glob.h>
-
+#include <readline/readline.h>
+#include <readline/history.h>
 class Rash{
 public:
 	Rash();
