@@ -55,8 +55,6 @@ TEST(ShellTest, testExpansion) {
 	EXPECT_EQ(shell->expand(input)[1], "pub");
 	input = {"ls", "D*"};
 	EXPECT_EQ(shell->expand(input)[2], "Documents");
-	input = {"ls", "/*"};
-	EXPECT_EQ(shell->globString(input[1]), "/backup /bin /boot /dev /etc /home /lib /lib64 /lost+found /mnt /opt /proc /root /run /sbin /srv /sys /tmp /usr /var ");
 }
 
 TEST(ShellTest, testInputParsing) {
@@ -64,7 +62,31 @@ TEST(ShellTest, testInputParsing) {
 	vector<string> input = {"ls", "~/pub", "|", "grep", "wah"};
 
 	Op *root = shell->parse(input);
-	EXPECT_EQ(root->lhs->execute(), "test\nwah.txt");
+	EXPECT_EQ(root->type(), "PipeOp");
+	EXPECT_EQ(root->lhs->type(), "CommandOp");
+	EXPECT_EQ(root->lhs->lhs->type(), "NullOp");
+	delete root;
+
+	input = {"ls", "~/pub", ">", "test", "|", "grep", "wah"};
+
+	root = shell->parse(input);
+	EXPECT_EQ(root->type(), "PipeOp");
+	EXPECT_EQ(root->lhs->type(), "OutputRedirOp");
+	delete root;
+	input = {"ls", "~/pub", ">", "test", "|", "grep", "<", "test2"};
+
+	root = shell->parse(input);
+	EXPECT_EQ(root->type(), "PipeOp");
+	EXPECT_EQ(root->lhs->type(), "OutputRedirOp");
+	EXPECT_EQ(root->rhs->type(), "InputRedirOp");
+	delete root;
+	input = {"cat", "<", "filename", "|", "sort", ">", "sortedFile"};
+
+	root = shell->parse(input);
+	EXPECT_EQ(root->type(), "PipeOp");
+	EXPECT_EQ(root->lhs->type(), "InputRedirOp");
+	EXPECT_EQ(root->rhs->type(), "OutputRedirOp");
+	delete root;
 }
 
 GTEST_API_ int main(int argc, char *argv[]){

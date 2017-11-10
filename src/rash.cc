@@ -36,38 +36,46 @@ string Rash::interpret(vector<string> &input) {
 	return output;
 }
 
-//This should be recursive
+//Pipes take precedence
+//redirects are evaluated from left to right; must be added to tree from right to left
 Op *Rash::parse(vector<string> &input) {
 	//get last postition of an operator
-	int nextOpPos = getLastPositionOf(input, "|><");
+	int nextOpPos = getLastPositionOf(input, "|");
+	if (nextOpPos == -1) {
+		nextOpPos = getLastPositionOf(input, "<>");
+		if (nextOpPos == -1){
+			return new CommandOp(input);
+		}
+	}
 
 	//set that operator as root
 	Op *nextOp;
-	if (nextOpPos == -1) {
-		return new CommandOp(input);
-	} else if (input[nextOpPos] == "|") {
+	if (input[nextOpPos] == "|") {
 		nextOp = new PipeOp();
 	} else if (input[nextOpPos] == ">") {
 		nextOp = new OutputRedirOp();
 	} else if (input[nextOpPos] == "<") {
 		nextOp = new InputRedirOp();
 	}
+	vector<string>::iterator start;
+	vector<string>::iterator end;
 
-	//set everything to the right of the operator as its rhs
-	vector<string>::iterator start = input.begin() + nextOpPos + 1;
-	vector<string>::iterator end = input.begin() + input.size() - 1;
+	start = input.begin() + nextOpPos + 1;
+	end = input.begin() + input.size();
 	vector<string> newrhs(start, end);
-	nextOp->rhs = parse(newrhs);
 
-	//set the lhs as a recursive call on the vector to the left of the operator
 	start = input.begin();
-	end = input.begin() + nextOpPos - 1;
+	end = input.begin() + nextOpPos;
 	vector<string> newlhs(start, end);
+
+	nextOp->rhs = parse(newrhs);
 	nextOp->lhs = parse(newlhs);
 
 	return nextOp;
 }
 
+//Clearline from:
+//https://stackoverflow.com/questions/1508490/erase-the-current-printed-console-line
 string Rash::promptForInput() {
 	char *input = strdup("");
 	string pwd = getPwd();
@@ -80,18 +88,6 @@ string Rash::promptForInput() {
 	return string(output);
 }
 
-string Rash::globString(string input){
-	glob_t result;
-	if(glob(input.c_str(), GLOB_NOCHECK, NULL, &result) == 0){
-		input = "";
-		for(uint j = 0; j < result.gl_pathc; j++)
-			input += string(result.gl_pathv[j]) + " ";
-	} else {
-		return "";
-	}
-	return input;
-}
-
 vector<string> Rash::expand(vector<string> &input) {
 	int vecSize = input.size();
 	for(uint i = 0; i < vecSize; i++){
@@ -102,11 +98,12 @@ vector<string> Rash::expand(vector<string> &input) {
 
 		if(input[i].find_first_of("*") == string::npos)
 			continue;
-		input[i] = globString(input[i]);
 
-		if(input[i] != ""){
-			for(auto v : splitStr(input[i], strdup(" ")[0])) 
-				input.insert(input.begin() + i + 1, v);
+		glob_t result;
+		if(glob(input[i].c_str(), GLOB_NOCHECK, NULL, &result) == 0){
+			input[i] = "";
+			for(uint j = 0; j < result.gl_pathc; j++)
+				input.insert(input.begin() + i + 1, string(result.gl_pathv[j]));
 			input.erase(input.begin() + i);
 		} else {
 			input[0] = "";

@@ -72,7 +72,6 @@ string findBin(string cmd) {
 	return "";
 }
 
-
 //Getting the index of the iterator on return is from:
 //https://stackoverflow.com/questions/24997910/get-index-in-vector-from-reverse-iterator
 int getLastPositionOf(vector<string> &input, string delims) {
