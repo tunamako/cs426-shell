@@ -9,7 +9,7 @@ class Op {
 public:
 	Op();
 	~Op();
-	virtual std::string execute();
+	virtual int execute(int inoutfds[2]);
 
 	Op *lhs;
 	Op *rhs;
@@ -22,7 +22,7 @@ class NullOp: public Op {
 public:
 	NullOp();
 	~NullOp();
-	virtual std::string execute();
+	virtual int execute(int inoutfds[2]);
 	virtual std::string type() {
 		return "NullOp";
 	}
@@ -32,7 +32,7 @@ class OutputRedirOp: public Op {
 public:
 	OutputRedirOp();
 	~OutputRedirOp();
-	virtual std::string execute();
+	virtual int execute(int inoutfds[2]);
 	virtual std::string type() {
 		return "OutputRedirOp";
 	}
@@ -42,7 +42,7 @@ class InputRedirOp: public Op {
 public:
 	InputRedirOp();
 	~InputRedirOp();
-	virtual std::string execute();
+	virtual int execute(int inoutfds[2]);
 	virtual std::string type() {
 		return "InputRedirOp";
 	}
@@ -51,7 +51,7 @@ public:
 class PipeOp: public Op {
 public:
 	PipeOp();
-	virtual std::string execute();
+	virtual int execute(int inoutfds[2]);
 	virtual std::string type() {
 		return "PipeOp";
 	}
@@ -60,7 +60,7 @@ public:
 class CommandOp: public Op {
 public:
 	CommandOp(std::vector<std::string> &input);
-	virtual std::string execute();
+	virtual int execute(int inoutfds[2]);
 	bool checkBuiltins();
 
 	std::vector<std::string> input;

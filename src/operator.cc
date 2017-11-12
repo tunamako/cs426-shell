@@ -2,10 +2,11 @@
 
 using namespace std;
 
+//Have all executes return file descriptors for their output!
+
 Op::Op(){}
 Op::~Op(){}
-string Op::execute() {
-	return "";
+int Op::execute(int inoutfds[2]) {
 }
 
 NullOp::NullOp(){
@@ -13,28 +14,34 @@ NullOp::NullOp(){
 	lhs = NULL;
 }
 NullOp::~NullOp(){}
-string NullOp::execute() {
-	return "";
+int NullOp::execute(int inoutfds[2]) {
 }
 
 OutputRedirOp::OutputRedirOp() {}
 OutputRedirOp::~OutputRedirOp() {}
-string OutputRedirOp::execute() {
-	//fork
-	//if the kid
-		//fd = open target file
-		//dup2(fd, 0)
-	return "";
+int OutputRedirOp::execute(int inoutfds[2]) {
 }
 
 InputRedirOp::InputRedirOp() {}
 InputRedirOp::~InputRedirOp() {}
-string InputRedirOp::execute() {
-	return "";
+int InputRedirOp::execute(int inoutfds[2]) {
 }
 
 PipeOp::PipeOp() {}
-string PipeOp::execute() {
+
+//inoutfds specify the optional filedescriptors that this 
+//particular pipe should input from and output to. (input is ignored as pipes always take input from the lhs)
+//pipefds serves as the "bridge" between the lhs and rhs of the pipe operator
+//lhsfds are like inoutfds, but specifying the lhs's input and output fds
+int PipeOp::execute(int inoutfds[2]) {
+	int pipefds[2];
+	pipe(pipefds);
+
+	int lhsfds[2] = {-1, pipefds[1]};
+	int rhsfds[2] = {pipefds[0], inoutfds[1]};
+
+	lhs->execute(lhsfds);
+	rhs->execute(rhsfds);
 }
 
 
@@ -46,40 +53,35 @@ CommandOp::CommandOp(vector<string> &input){
 
 //info on piping to a buffer is from:
 //https://stackoverflow.com/questions/7292642/grabbing-output-from-exec
-string CommandOp::execute() {
+int CommandOp::execute(int inoutfds[2]) {
 	if(input[0].size() == 0 || checkBuiltins())
-		return "";
-	
-	string executable = findBin(input[0]);
-	if(executable == "")
-		return "rash: Command not found: " + input[0] + "\n";
+		return -1;
 
-	int pipefds[2];
-	char buffer[4096];
+	string executable = findBin(input[0]);
+	if(executable == "") 
+		cerr << "rash: Command not found: " + input[0] + "\n";
+
 	char **args = convertVector(input);
 
-	pipe(pipefds);
-	memset(buffer, 0, 4096);
-	int pid = fork();	
-
-	if(pid == 0) {
-		close(pipefds[0]);
-		
-		dup2(pipefds[1], STDOUT_FILENO);
+	int pid = fork();
+	if(pid == 0){
+		if(inoutfds[0] != -1) {
+			dup2(inoutfds[0], STDIN_FILENO);
+			close(inoutfds[0]);
+		}
+		if(inoutfds[1] != -1) {
+			dup2(inoutfds[1], STDOUT_FILENO);
+			close(inoutfds[1]);
+		}
 		execv(executable.c_str(), args);
 	} else {
-		close(pipefds[1]);
-
-		read(pipefds[0], (void *)buffer, 4096);
-		waitpid(pid, NULL, WNOHANG);
-
-		close(pipefds[0]);
-		
-		for(uint i = 0; i < sizeof(args)/sizeof(args[0]); i++) {
-			delete[] args[i];
+		if(inoutfds[0] != -1) {
+			close(inoutfds[0]);
 		}
-		delete[] args;
-		return string(strdup(buffer));
+		if(inoutfds[1] != -1) {
+			close(inoutfds[1]);
+		}
+		return pid;
 	}
 }
 

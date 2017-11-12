@@ -87,6 +87,15 @@ TEST(ShellTest, testInputParsing) {
 	EXPECT_EQ(root->lhs->type(), "InputRedirOp");
 	EXPECT_EQ(root->rhs->type(), "OutputRedirOp");
 	delete root;
+
+	input = {"cat", "<", "filename", "|", "grep", "wah", "|", "sort", ">", "sortedFile"};
+
+	root = shell->parse(input);
+	EXPECT_EQ(root->type(), "PipeOp");
+	EXPECT_EQ(root->lhs->type(), "PipeOp");
+	EXPECT_EQ(root->lhs->rhs->type(), "CommandOp");
+	EXPECT_EQ(root->lhs->lhs->type(), "InputRedirOp");
+	delete root;
 }
 
 GTEST_API_ int main(int argc, char *argv[]){

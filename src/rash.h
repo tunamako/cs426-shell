@@ -7,6 +7,7 @@
 #include <glob.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <algorithm>
 class Rash{
 public:
 	Rash();
@@ -14,7 +15,7 @@ public:
 	
 	void run();
 	std::string promptForInput();
-	std::string interpret(std::vector<std::string> &input);
+	void interpret(std::vector<std::string> &input);
 	std::vector<std::string> expand(std::vector<std::string> &input);
 	Op *parse(std::vector<std::string> &input);
 	

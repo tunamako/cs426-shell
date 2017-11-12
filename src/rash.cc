@@ -17,23 +17,26 @@ void Rash::run(){
 	vector<string> input;
 	while(true) {
 		input = splitStr(promptForInput(), ' ');
-		cout << interpret(input);
+		interpret(input);
 	}
 }
 
-string Rash::interpret(vector<string> &input) {
+void Rash::interpret(vector<string> &input) {
 	input = expand(input);
 	if(input.size() == 0){
-		return "";
+		return;
 	}
 	if(input[0] == ""){
 		perror("glob");
-		return "";
+		return;
 	}
 	Op *root = parse(input);
-	string output = root->execute();
+	int rootfds[2] = {-1, -1};
+	int rootpid = root->execute(rootfds);
+
+	while(wait(NULL) > 0)
+		continue;
 	delete root;
-	return output;
 }
 
 //Pipes take precedence
@@ -90,7 +93,7 @@ string Rash::promptForInput() {
 
 vector<string> Rash::expand(vector<string> &input) {
 	int vecSize = input.size();
-	for(uint i = 0; i < vecSize; i++){
+	for(int i = 0; i < vecSize; i++){
 		if (input[i][0] == '~')
 			input[i].replace(0, 1, "/home/" + uname);
 		else if (input[i][0] == '$')
