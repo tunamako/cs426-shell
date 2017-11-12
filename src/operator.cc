@@ -20,6 +20,18 @@ int NullOp::execute(int inoutfds[2]) {
 OutputRedirOp::OutputRedirOp() {}
 OutputRedirOp::~OutputRedirOp() {}
 int OutputRedirOp::execute(int inoutfds[2]) {
+	char * filename = strdup(rhs->getInput()[0].c_str());
+	int outfile = open(filename, O_RDWR | O_TRUNC | O_CREAT, 00666);
+	
+	if(outfile < 0) {
+		cerr << "rash: failed to open file: " + string(filename) << endl;
+		return -1;
+	}
+	delete filename;
+
+	int lhsfds[2] = {inoutfds[0], outfile};
+
+	lhs->execute(lhsfds);
 }
 
 InputRedirOp::InputRedirOp() {}
@@ -29,8 +41,8 @@ int InputRedirOp::execute(int inoutfds[2]) {
 
 PipeOp::PipeOp() {}
 
-//inoutfds specify the optional filedescriptors that this 
-//particular pipe should input from and output to. (input is ignored as pipes always take input from the lhs)
+//inoutfds specify the optional file descriptors that this particular pipe
+//should input from and output to. (input is ignored as pipes always take input from the lhs)
 //pipefds serves as the "bridge" between the lhs and rhs of the pipe operator
 //lhsfds are like inoutfds, but specifying the lhs's input and output fds
 int PipeOp::execute(int inoutfds[2]) {

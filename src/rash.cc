@@ -42,7 +42,7 @@ void Rash::interpret(vector<string> &input) {
 //Pipes take precedence
 //redirects are evaluated from left to right; must be added to tree from right to left
 Op *Rash::parse(vector<string> &input) {
-	//get last postition of an operator
+	//get last postition of an operator, prioritising pipes before redirects
 	int nextOpPos = getLastPositionOf(input, "|");
 	if (nextOpPos == -1) {
 		nextOpPos = getLastPositionOf(input, "<>");
