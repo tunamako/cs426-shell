@@ -38,7 +38,7 @@ string getEnv(string varname) {
 
 string getPwd() {
 	char temp[4096];
-	ErrorCheckExit(getcwd(temp, 4096) == NULL, "Couldn't get current directory");
+	ErrorCheckExit(getcwd(temp, 4096) == NULL, "getcwd");
 	return string(temp);
 }
 

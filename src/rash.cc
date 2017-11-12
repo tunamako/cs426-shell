@@ -3,13 +3,8 @@
 using namespace std;
 
 Rash::Rash(){
-	pathdirs = splitStr(getEnv("PATH"), ':');
-	ErrorCheckExit(pathdirs.size() == 0, "Couldn't get PATH");
-
-	uname = getpwuid(getuid())->pw_name;
-	const char* home = ("/home/" + uname).c_str();
-	chdir(home);
-	setenv(strdup("PWD"), home, 1);
+	chdir(getenv("HOME"));
+	setenv("PWD", getenv("HOME"), 1);
 }
 Rash::~Rash(){}
 
@@ -30,12 +25,13 @@ void Rash::interpret(vector<string> &input) {
 		perror("glob");
 		return;
 	}
+
 	Op *root = parse(input);
-	int rootfds[2] = {-1, -1};
-	int rootpid = root->execute(rootfds);
+	int rootpid = root->execute(-1, -1);
 
 	while(wait(NULL) > 0)
 		continue;
+
 	delete root;
 }
 
@@ -80,25 +76,34 @@ Op *Rash::parse(vector<string> &input) {
 //Clearline from:
 //https://stackoverflow.com/questions/1508490/erase-the-current-printed-console-line
 string Rash::promptForInput() {
-	char *input = strdup("");
 	string pwd = getPwd();
-	if (pwd.substr(0, 6 + uname.size()) == "/home/" + uname)
-		pwd.replace(0, 6 + uname.size(), "~");
+	string user = string(getenv("USER"));
+	string home = string(getenv("HOME"));
+
+	if (pwd.substr(0, 6 + user.size()) == home)
+		pwd.replace(0, 6 + user.size(), "~");
 	
-	string prompt = "[" + uname + "@ " + pwd + "]$ ";
+	string prompt = "[" + user + "@ " + pwd + "]$ ";
+
 	char *output = readline(("\33[2K\r" + prompt).c_str());
 	add_history(output);
+
 	return string(output);
 }
 
 vector<string> Rash::expand(vector<string> &input) {
 	int vecSize = input.size();
 	for(int i = 0; i < vecSize; i++){
-		if (input[i][0] == '~')
-			input[i].replace(0, 1, "/home/" + uname);
-		else if (input[i][0] == '$')
-			input[i] = getEnv(input[i].substr(1, input[i].size() - 1));
+		if (input[i][0] == '~'){
+			input[i].replace(0, 1, getenv("HOME"));
 
+		} else if (input[i][0] == '$'){
+			char *ret = getenv(input[i].erase(0, 1).c_str());
+			if(ret == 0) 
+				input[i] = "";
+			else 
+				input[i] = string(ret);
+		}
 		if(input[i].find_first_of("*") == string::npos)
 			continue;
 

@@ -1,3 +1,4 @@
+#pragma once
 #ifndef OP_H
 #define OP_H
 #include "helpers.h"
@@ -11,7 +12,7 @@ class Op {
 public:
 	Op();
 	~Op();
-	virtual int execute(int inoutfds[2]);
+	virtual int execute(int infd, int outfd);
 	virtual std::string type() {
 		return "Op";
 	}
@@ -24,7 +25,7 @@ class NullOp: public Op {
 public:
 	NullOp();
 	~NullOp();
-	virtual int execute(int inoutfds[2]);
+	virtual int execute(int infd, int outfd);
 	virtual std::string type() {
 		return "NullOp";
 	}
@@ -34,7 +35,7 @@ class OutputRedirOp: public Op {
 public:
 	OutputRedirOp();
 	~OutputRedirOp();
-	virtual int execute(int inoutfds[2]);
+	virtual int execute(int infd, int outfd);
 	virtual std::string type() {
 		return "OutputRedirOp";
 	}
@@ -44,7 +45,7 @@ class InputRedirOp: public Op {
 public:
 	InputRedirOp();
 	~InputRedirOp();
-	virtual int execute(int inoutfds[2]);
+	virtual int execute(int infd, int outfd);
 	virtual std::string type() {
 		return "InputRedirOp";
 	}
@@ -53,7 +54,7 @@ public:
 class PipeOp: public Op {
 public:
 	PipeOp();
-	virtual int execute(int inoutfds[2]);
+	virtual int execute(int infd, int outfd);
 	virtual std::string type() {
 		return "PipeOp";
 	}
@@ -62,7 +63,7 @@ public:
 class CommandOp: public Op {
 public:
 	CommandOp(std::vector<std::string> &input);
-	virtual int execute(int inoutfds[2]);
+	virtual int execute(int infd, int outfd);
 	bool checkBuiltins();
 	virtual std::string type() {
 		return "CommandOp";

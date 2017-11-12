@@ -30,19 +30,6 @@ TEST(HelpersTest, testVecConversion) {
 	EXPECT_EQ(string(result[3]), test[3]);
 }
 
-
-
-TEST(ShellTest, testCreation){
-	Rash *shell = new Rash();
-
-	EXPECT_EQ(shell->uname, "michael");
-	EXPECT_EQ(shell->pathdirs[0], "/usr/local/sbin");
-	EXPECT_EQ(shell->pathdirs[2], "/usr/bin");
-
-	Rash *anothershell = new Rash();
-	EXPECT_EQ(anothershell->uname, "michael");
-}
-
 TEST(ShellTest, testExpansion) {
 	Rash *shell = new Rash();
 	vector<string> input = {"ls", "~"};
