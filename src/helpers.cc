@@ -14,6 +14,8 @@ void ErrorCheck(bool condition, string message) {
 		perror(message.c_str());
 }
 
+//Some info on stringstreams from
+//https://stackoverflow.com/questions/11719538/how-to-use-stringstream-to-separate-comma-separated-strings
 vector<string> splitStr(string aString, char delimiter) {
 	vector<string> ret;
 	stringstream ss(aString);

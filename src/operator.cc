@@ -2,8 +2,6 @@
 
 using namespace std;
 
-//Have all executes return file descriptors for their output!
-
 Op::Op(){}
 Op::~Op(){}
 int Op::execute(int infd, int outfd) {
@@ -13,12 +11,9 @@ NullOp::NullOp(){
 	rhs = NULL;
 	lhs = NULL;
 }
-NullOp::~NullOp(){}
-int NullOp::execute(int infd, int outfd) {
-}
+int NullOp::execute(int infd, int outfd) {}
 
 OutputRedirOp::OutputRedirOp() {}
-OutputRedirOp::~OutputRedirOp() {}
 int OutputRedirOp::execute(int infd, int outfd) {
 	char * filename = strdup(rhs->getInput()[0].c_str());
 	int outfile = open(filename, O_RDWR | O_TRUNC | O_CREAT, 00666);
@@ -33,7 +28,6 @@ int OutputRedirOp::execute(int infd, int outfd) {
 }
 
 InputRedirOp::InputRedirOp() {}
-InputRedirOp::~InputRedirOp() {}
 int InputRedirOp::execute(int infd, int outfd) {
 	char * filename = strdup(rhs->getInput()[0].c_str());
 	int infile = open(filename, O_RDWR);
@@ -48,7 +42,6 @@ int InputRedirOp::execute(int infd, int outfd) {
 }
 
 PipeOp::PipeOp() {}
-
 int PipeOp::execute(int infd, int outfd) {
 	int pipefds[2];
 	ErrorCheck(pipe(pipefds) < 0, "pipe");
@@ -95,7 +88,7 @@ int CommandOp::execute(int infd, int outfd) {
 bool CommandOp::checkBuiltins() {
 	if(input[0] == "cd"){
 		if(input.size() == 1)
-			input.push_back("/home/" + string(getenv("USER")));
+			input.push_back((getenv("HOME")));
 		if(chdir(input[1].c_str()) != -1)
 			setenv("PWD", input[1].c_str(), 1);
 		else
